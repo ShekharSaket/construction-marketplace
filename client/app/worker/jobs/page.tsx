@@ -27,7 +27,7 @@ export default function WorkerJobs() {
 
         const res =
           await fetch(
-            `[https://construction-marketplace-ttob.onrender.com](https://construction-marketplace-ttob.onrender.com)/api/bookings/worker/${workerId}`
+            `https://construction-marketplace-ttob.onrender.com/api/bookings/worker/${workerId}`
           );
 
         const data =

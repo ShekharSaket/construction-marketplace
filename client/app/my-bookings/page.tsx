@@ -14,7 +14,7 @@ export default function MyBookings() {
 
   const fetchBookings = async () => {
     try {
-      const res = await fetch("[https://construction-marketplace-ttob.onrender.com](https://construction-marketplace-ttob.onrender.com)/api/bookings");
+      const res = await fetch("https://construction-marketplace-ttob.onrender.com/api/bookings");
       const data = await res.json();
       console.log(data);
       setBookings(data);

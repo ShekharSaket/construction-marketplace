@@ -19,7 +19,7 @@ export default function RegisterPage() {
   const handleRegister = async () => {
 
     const res = await fetch(
-      "[https://construction-marketplace-ttob.onrender.com](https://construction-marketplace-ttob.onrender.com)/api/auth/register",
+      "https://construction-marketplace-ttob.onrender.com/api/auth/register",
       {
         method: "POST",
 

@@ -11,7 +11,7 @@ export default function WorkerDashboard() {
     checkAuth();
 
     // 1. Initialize socket connection
-    const socket = io("[https://construction-marketplace-ttob.onrender.com](https://construction-marketplace-ttob.onrender.com)");
+    const socket = io("https://construction-marketplace-ttob.onrender.com");
 
     // Get the real worker ID from local storage (fallback to your hardcoded one for testing)
     const storedUser = JSON.parse(localStorage.getItem("user") || "{}");

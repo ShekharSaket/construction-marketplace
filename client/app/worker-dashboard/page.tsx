@@ -9,7 +9,7 @@ export default function WorkerDashboard() {
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    const socket = io("[https://construction-marketplace-ttob.onrender.com](https://construction-marketplace-ttob.onrender.com)");
+    const socket = io("https://construction-marketplace-ttob.onrender.com");
     const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
     setUser(storedUser);
 
@@ -56,7 +56,7 @@ export default function WorkerDashboard() {
   // Fetch jobs assigned to this worker
   const fetchActiveJobs = async (workerId: string) => {
     try {
-      const res = await fetch(`[https://construction-marketplace-ttob.onrender.com](https://construction-marketplace-ttob.onrender.com)/api/bookings/worker/${workerId}`);
+      const res = await fetch(`https://construction-marketplace-ttob.onrender.com/api/bookings/worker/${workerId}`);
       const data = await res.json();
       
       // Filter out jobs that are already completed
@@ -70,7 +70,7 @@ export default function WorkerDashboard() {
   // Mark job as completed
   const handleCompleteJob = async (bookingId: string) => {
     try {
-      const res = await fetch(`[https://construction-marketplace-ttob.onrender.com](https://construction-marketplace-ttob.onrender.com)/api/bookings/${bookingId}/complete`, {
+      const res = await fetch(`https://construction-marketplace-ttob.onrender.com/api/bookings/${bookingId}/complete`, {
         method: "PUT",
       });
 

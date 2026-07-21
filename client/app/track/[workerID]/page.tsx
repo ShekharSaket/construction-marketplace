@@ -25,7 +25,7 @@ export default function TrackWorker() {
     // Fetch the Customer's job site location from the database
     const fetchBooking = async () => {
       try {
-        const res = await fetch(`[https://construction-marketplace-ttob.onrender.com](https://construction-marketplace-ttob.onrender.com)/api/bookings/worker/${workerId}`);
+        const res = await fetch(`https://construction-marketplace-ttob.onrender.com/api/bookings/worker/${workerId}`);
         if (!res.ok) throw new Error("Failed to fetch");
 
         const data = await res.json();
@@ -46,7 +46,7 @@ export default function TrackWorker() {
     fetchBooking();
 
     // Connect to Socket.io to get the Worker's live GPS updates
-    const socket = io("[https://construction-marketplace-ttob.onrender.com](https://construction-marketplace-ttob.onrender.com)");
+    const socket = io("https://construction-marketplace-ttob.onrender.com");
 
     socket.emit("join-tracking", workerId);
 

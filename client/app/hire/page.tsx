@@ -44,7 +44,7 @@ export default function HireWorkerPage() {
         };
 
         try {
-          const res = await fetch("[https://construction-marketplace-ttob.onrender.com](https://construction-marketplace-ttob.onrender.com)/api/bookings", {
+          const res = await fetch("https://construction-marketplace-ttob.onrender.com/api/bookings", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({

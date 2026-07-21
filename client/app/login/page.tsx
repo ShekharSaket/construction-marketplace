@@ -27,7 +27,7 @@ export default function LoginPage() {
 
         const res =
           await fetch(
-            "[https://construction-marketplace-ttob.onrender.com](https://construction-marketplace-ttob.onrender.com)/api/auth/login",
+            "https://construction-marketplace-ttob.onrender.com/api/auth/login",
             {
               method: "POST",
 

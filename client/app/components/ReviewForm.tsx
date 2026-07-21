@@ -26,7 +26,7 @@ export default function ReviewForm({ bookingId, workerId, onReviewSubmitted }: R
     setMessage("");
 
     try {
-      const response = await fetch(`[https://construction-marketplace-ttob.onrender.com](https://construction-marketplace-ttob.onrender.com)/api/bookings/${bookingId}/review`, {
+      const response = await fetch(`https://construction-marketplace-ttob.onrender.com/api/bookings/${bookingId}/review`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
