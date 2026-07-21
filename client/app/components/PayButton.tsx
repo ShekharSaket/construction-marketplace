@@ -29,7 +29,7 @@ export default function PayButton({ amount, bookingId }: { amount: number, booki
       }
 
       // 2. Create the Order on your Backend
-      const orderRes = await fetch("http://localhost:5000/api/payments/create-order", {
+      const orderRes = await fetch("https://construction-marketplace-ttob.onrender.com/api/payments/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         // Your controller expects 'amount' in the body
@@ -48,7 +48,7 @@ export default function PayButton({ amount, bookingId }: { amount: number, booki
         order_id: order.id,
         handler: async function (response: any) {
           // 4. Verify Payment on your Backend
-          const verifyRes = await fetch("[https://construction-marketplace-ttob.onrender.com](https://construction-marketplace-ttob.onrender.com)/api/payments/verify", {
+          const verifyRes = await fetch("https://construction-marketplace-ttob.onrender.com/api/payments/verify", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
