@@ -11,7 +11,10 @@ dotenv.config();
 const app = express();
 connectDB();
 
-app.use(cors());
+app.use(cors({
+    origin: ["http://localhost:3000", "https://construction-marketplace-sepia.vercel.app"],
+    credentials: true
+}));
 app.use(express.json());
 
 const server = http.createServer(app);
