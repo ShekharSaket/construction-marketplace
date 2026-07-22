@@ -8,21 +8,23 @@ const DynamicMap = dynamic(() => import("./components/Map"), {
   ssr: false, 
   loading: () => (
     <div className="w-full h-[400px] bg-gray-200 rounded-2xl animate-pulse relative overflow-hidden flex flex-col items-center justify-center border border-gray-300">
-      
-      {/* Faux UI to mimic map controls */}
       <div className="absolute top-4 left-4 bg-white/60 w-32 h-8 rounded shadow-sm"></div>
       <div className="absolute top-4 right-4 bg-white/60 w-10 h-10 rounded shadow-sm"></div>
-      
-      {/* Map Pin SVG Icon */}
       <svg className="w-12 h-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.242-4.243a8 8 0 1111.314 0z"></path>
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
       </svg>
-      
       <p className="text-gray-500 font-medium tracking-wide">Locating workers near you...</p>
     </div>
   ),
 });
+
+// MOCK DATA: We will replace this with your actual database later!
+const mockWorkers = [
+  { id: 1, name: "Amit Sharma", trade: "Electrician", rating: 4.8, rate: "₹500/hr", available: true },
+  { id: 2, name: "Rajesh Kumar", trade: "Plumber", rating: 4.6, rate: "₹450/hr", available: true },
+  { id: 3, name: "Suresh Singh", trade: "Carpenter", rating: 4.9, rate: "₹600/hr", available: false },
+];
 
 export default function HomePage() {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -40,7 +42,7 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen bg-gray-50 p-4 md:p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
+      <div className="max-w-7xl mx-auto space-y-8">
         
         <header className="space-y-2">
           <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-gray-900">
@@ -51,8 +53,60 @@ export default function HomePage() {
           </p>
         </header>
 
+        {/* MAP SECTION */}
         <section className="w-full bg-white p-4 rounded-3xl shadow-sm border border-gray-100">
           <DynamicMap liveLocation={userLocation} />
+        </section>
+
+        {/* WORKER PROFILES GRID SECTION */}
+        <section className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-semibold text-gray-900">Available Professionals</h2>
+            <span className="text-sm font-medium text-blue-600 cursor-pointer hover:underline">View All</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {mockWorkers.map((worker) => (
+              <div 
+                key={worker.id} 
+                className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition-shadow"
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-4">
+                    {/* Placeholder Avatar using Flexbox */}
+                    <div className="w-14 h-14 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 font-bold text-xl">
+                      {worker.name.charAt(0)}
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-gray-900">{worker.name}</h3>
+                      <p className="text-sm text-gray-500">{worker.trade}</p>
+                    </div>
+                  </div>
+                  {/* Status Badge */}
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${worker.available ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                    {worker.available ? 'Available' : 'Busy'}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
+                  <div>
+                    <p className="text-sm text-gray-500">Rate</p>
+                    <p className="text-lg font-semibold text-gray-900">{worker.rate}</p>
+                  </div>
+                  <button 
+                    disabled={!worker.available}
+                    className={`px-5 py-2 rounded-lg font-medium transition-colors ${
+                      worker.available 
+                        ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                        : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    }`}
+                  >
+                    {worker.available ? 'Book Now' : 'Unavailable'}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </section>
 
       </div>
