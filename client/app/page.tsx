@@ -93,17 +93,17 @@ export default function HomePage() {
                     <p className="text-lg font-semibold text-gray-900">{worker.rate}</p>
                   </div>
                   
-                  {/* RAZORPAY BUTTON INTEGRATION */}
-                  {worker.available ? (
-                    <PayButton
-                      amount={parseInt(worker.rate.replace(/\D/g, '')) || 500}
-                      bookingId={`booking-${worker.id}`}
-                    />
-                  ) : (
-                    <button disabled className="px-5 py-2 rounded-lg font-medium transition-colors bg-gray-100 text-gray-400 cursor-not-allowed">
-                      Unavailable
-                    </button>
-                  )}
+                 {/* RAZORPAY BUTTON INTEGRATION */}
+{worker.available ? (
+  <PayButton 
+    amount={parseInt(worker.rate.replace(/\D/g, '')) || 500} 
+    bookingId={`test_booking_${worker.id}`} // <-- Added this line!
+  />
+) : (
+  <button disabled className="px-5 py-2 rounded-lg font-medium transition-colors bg-gray-100 text-gray-400 cursor-not-allowed">
+    Unavailable
+  </button>
+)}
                   
                 </div>
               </div>
