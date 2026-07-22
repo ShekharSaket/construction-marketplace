@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
+import PayButton from "./components/PayButton"; // <-- Imported your custom payment button
 
 // THE UPGRADED DYNAMIC IMPORT WITH STRUCTURAL PLACEHOLDER
 const DynamicMap = dynamic(() => import("./components/Map"), {
@@ -19,7 +20,7 @@ const DynamicMap = dynamic(() => import("./components/Map"), {
   ),
 });
 
-// MOCK DATA: We will replace this with your actual database later!
+// MOCK DATA
 const mockWorkers = [
   { id: 1, name: "Amit Sharma", trade: "Electrician", rating: 4.8, rate: "₹500/hr", available: true },
   { id: 2, name: "Rajesh Kumar", trade: "Plumber", rating: 4.6, rate: "₹450/hr", available: true },
@@ -31,7 +32,7 @@ export default function HomePage() {
 
   useEffect(() => {
     if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition((position) => {
+      navigator.geolocation.getCurrentPosition((position: GeolocationPosition) => {
         setUserLocation({
           lat: position.coords.latitude,
           lng: position.coords.longitude,
@@ -73,7 +74,6 @@ export default function HomePage() {
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-4">
-                    {/* Placeholder Avatar using Flexbox */}
                     <div className="w-14 h-14 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 font-bold text-xl">
                       {worker.name.charAt(0)}
                     </div>
@@ -82,7 +82,6 @@ export default function HomePage() {
                       <p className="text-sm text-gray-500">{worker.trade}</p>
                     </div>
                   </div>
-                  {/* Status Badge */}
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${worker.available ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                     {worker.available ? 'Available' : 'Busy'}
                   </span>
@@ -93,16 +92,19 @@ export default function HomePage() {
                     <p className="text-sm text-gray-500">Rate</p>
                     <p className="text-lg font-semibold text-gray-900">{worker.rate}</p>
                   </div>
-                  <button 
-                    disabled={!worker.available}
-                    className={`px-5 py-2 rounded-lg font-medium transition-colors ${
-                      worker.available 
-                        ? 'bg-blue-600 text-white hover:bg-blue-700' 
-                        : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    }`}
-                  >
-                    {worker.available ? 'Book Now' : 'Unavailable'}
-                  </button>
+                  
+                  {/* RAZORPAY BUTTON INTEGRATION */}
+                  {worker.available ? (
+                    <PayButton
+                      amount={parseInt(worker.rate.replace(/\D/g, '')) || 500}
+                      bookingId={`booking-${worker.id}`}
+                    />
+                  ) : (
+                    <button disabled className="px-5 py-2 rounded-lg font-medium transition-colors bg-gray-100 text-gray-400 cursor-not-allowed">
+                      Unavailable
+                    </button>
+                  )}
+                  
                 </div>
               </div>
             ))}
