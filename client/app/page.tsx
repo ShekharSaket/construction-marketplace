@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
-import PayButton from "./components/PayButton"; // <-- Imported your custom payment button
+import PayButton from "./components/PayButton";
 
 // THE UPGRADED DYNAMIC IMPORT WITH STRUCTURAL PLACEHOLDER
 const DynamicMap = dynamic(() => import("./components/Map"), {
@@ -20,25 +20,47 @@ const DynamicMap = dynamic(() => import("./components/Map"), {
   ),
 });
 
-// MOCK DATA
-const mockWorkers = [
-  { id: 1, name: "Amit Sharma", trade: "Electrician", rating: 4.8, rate: "₹500/hr", available: true },
-  { id: 2, name: "Rajesh Kumar", trade: "Plumber", rating: 4.6, rate: "₹450/hr", available: true },
-  { id: 3, name: "Suresh Singh", trade: "Carpenter", rating: 4.9, rate: "₹600/hr", available: false },
-];
-
 export default function HomePage() {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  
+  // NEW STATES FOR LIVE DATABASE FETCHING
+  const [workers, setWorkers] = useState<any[]>([]);
+  const [loadingWorkers, setLoadingWorkers] = useState(true);
 
+  // 1. Fetch User Geolocation
   useEffect(() => {
     if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition((position: GeolocationPosition) => {
+      navigator.geolocation.getCurrentPosition((position) => {
         setUserLocation({
           lat: position.coords.latitude,
           lng: position.coords.longitude,
         });
       });
     }
+  }, []);
+
+  // 2. Fetch Live Workers from Backend
+  useEffect(() => {
+    const fetchLiveWorkers = async () => {
+      try {
+        // Update this URL if your backend route is named differently!
+        const response = await fetch("https://construction-marketplace-ttob.onrender.com/api/workers");
+        
+        if (!response.ok) throw new Error("Failed to fetch workers");
+        
+        const data = await response.json();
+        
+        // If your backend returns an object like { success: true, workers: [...] }, 
+        // you would use setWorkers(data.workers) instead.
+        setWorkers(data); 
+      } catch (error) {
+        console.error("Error loading professionals:", error);
+      } finally {
+        setLoadingWorkers(false);
+      }
+    };
+
+    fetchLiveWorkers();
   }, []);
 
   return (
@@ -66,49 +88,63 @@ export default function HomePage() {
             <span className="text-sm font-medium text-blue-600 cursor-pointer hover:underline">View All</span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {mockWorkers.map((worker) => (
-              <div 
-                key={worker.id} 
-                className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition-shadow"
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 font-bold text-xl">
-                      {worker.name.charAt(0)}
+          {loadingWorkers ? (
+            // Loading skeleton for the grid
+            <div className="flex items-center justify-center p-12 text-gray-500">
+              <p className="animate-pulse font-medium text-lg">Loading live database...</p>
+            </div>
+          ) : workers.length === 0 ? (
+            // Empty state if no workers are found
+            <div className="flex items-center justify-center p-12 bg-white rounded-2xl border border-gray-100">
+              <p className="text-gray-500 font-medium">No professionals found at this time.</p>
+            </div>
+          ) : (
+            // Live Data Grid
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {workers.map((worker) => (
+                <div 
+                  key={worker._id || worker.id} // MongoDB uses _id, mock data uses id
+                  className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition-shadow"
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-4">
+                      <div className="w-14 h-14 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 font-bold text-xl uppercase">
+                        {worker.name ? worker.name.charAt(0) : "W"}
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-bold text-gray-900">{worker.name}</h3>
+                        <p className="text-sm text-gray-500">{worker.trade}</p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="text-lg font-bold text-gray-900">{worker.name}</h3>
-                      <p className="text-sm text-gray-500">{worker.trade}</p>
-                    </div>
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${worker.available ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                      {worker.available ? 'Available' : 'Busy'}
+                    </span>
                   </div>
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${worker.available ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                    {worker.available ? 'Available' : 'Busy'}
-                  </span>
-                </div>
 
-                <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
-                  <div>
-                    <p className="text-sm text-gray-500">Rate</p>
-                    <p className="text-lg font-semibold text-gray-900">{worker.rate}</p>
+                  <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
+                    <div>
+                      <p className="text-sm text-gray-500">Rate</p>
+                      {/* Ensures rate handles numbers or strings from DB seamlessly */}
+                      <p className="text-lg font-semibold text-gray-900">₹{worker.rate}/hr</p>
+                    </div>
+                    
+                    {/* RAZORPAY BUTTON INTEGRATION */}
+                    {worker.available ? (
+                      <PayButton 
+                        amount={typeof worker.rate === 'number' ? worker.rate : (parseInt(worker.rate.toString().replace(/\D/g, '')) || 500)} 
+                        bookingId={`booking_${worker._id || worker.id}`} 
+                      />
+                    ) : (
+                      <button disabled className="px-5 py-2 rounded-lg font-medium transition-colors bg-gray-100 text-gray-400 cursor-not-allowed">
+                        Unavailable
+                      </button>
+                    )}
+                    
                   </div>
-                  
-                 {/* RAZORPAY BUTTON INTEGRATION */}
-{worker.available ? (
-  <PayButton 
-    amount={parseInt(worker.rate.replace(/\D/g, '')) || 500} 
-    bookingId={`test_booking_${worker.id}`} // <-- Added this line!
-  />
-) : (
-  <button disabled className="px-5 py-2 rounded-lg font-medium transition-colors bg-gray-100 text-gray-400 cursor-not-allowed">
-    Unavailable
-  </button>
-)}
-                  
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </section>
 
       </div>
