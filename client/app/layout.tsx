@@ -24,6 +24,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        {/* Preconnect to Google Maps to establish an early connection and speed up load time */}
+        <link rel="preconnect" href="https://maps.googleapis.com" />
+      </head>
       <body className="min-h-full flex flex-col">
         {children}
       </body>
